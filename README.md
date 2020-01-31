@@ -1,7 +1,3 @@
-## i-rules
-
-### Improving Transformation Rules to Avoid Useless Mutants
-
 ## Abstract
 
 Mutation testing is a program-transformation technique that injects code changes to a program and checks whether these changes are caught by the existing test suite. 
