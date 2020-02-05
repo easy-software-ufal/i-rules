@@ -269,7 +269,7 @@ git clone https://github.com/jboss-javassist/javassist -b 3.20
 
 # Evaluation 02 - Evaluating the *i-rules*
 
-
+![enter image description here](https://raw.githubusercontent.com/easy-software-ufal/i-rules/master/GQM%20Model.png)
 
 ....
 
