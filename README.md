@@ -1,4 +1,4 @@
-## Abstract
+# Improving Transformation Rules to Avoid Useless Mutants
 
 Mutation testing is a program-transformation technique that injects code changes to a program and checks whether these changes are caught by the existing test suite. 
 Despite attracting a lot of interest because of its reputation as a powerful adequacy criterion for test suites, the costs of using mutation testing are usually high, hindering its use in industry.
@@ -27,25 +27,6 @@ Our results are promising because (i) we \textit{avoid} useless mutants generati
 (iii) our \mujava{} version, embedded with the rules, takes less time to create and compile the mutants than the original version;
 and (iv) we implement only a subset of the rules we derived. 
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
 ### Authors
 
@@ -70,7 +51,470 @@ Informatics Center, Federal University of Pernambuco---Recife, PE, Brazil
 
 
 
+# Tools 
 
+## MuJava-AUM 
+We created a tool called Hunor to automate various steps of the study. We also developed hunor-maven-plugin to facilitate the execution of MuJava, MuJava-M, and mutation analysis in maven projects. To replicate the study or run the tools on other subjects, we provide a Docker image that contains all the tools and settings needed to run Hunor a maven project. The image is available on Docker Hub at https://hub.docker.com/r/mutationsubsumption/hunor.
+
+In each step of the study, we show the docker-compose configuration needed to replicate the experiment.
+
+
+# Evaluation 01 - Strategy
+
+
+
+The docker-compose file shown below runs Hunor with the necessary parameters to generate the DMSG that represents the dynamic subsuming relationship on all project targets.
+ 
+With Docker and Docker Compose installed on your machine, follow these steps:
+
+1) Create or use an existing maven project.
+2) Add the *docker-compose.yml* file to the project root, along with the [*config.json*](https://raw.githubusercontent.com/mutation-subsumption/subsumption-relations/master/config-discover.json) configuration file.
+3) Run docker-composer with the command:
+
+*docker-compose.yml*
+```yml
+version: '3'
+services:
+  hunor:
+    image: mutationsubsumption/hunor:0.9.8
+    working_dir: /opt/src
+    command: [
+      'hunor-pgen',
+      '-j', '/usr/local/openjdk-8',
+      '-m', '/usr/share/maven',
+      '-c', 'config.json',
+      '--coverage-threshold', '0',
+      '--mutation-tool', 'mujava',
+      '--mutants', 'mutants',
+      '--disable-minimal-testsuite',
+      '--enable-new-mutations',
+      '--suites-evosuite', '5',
+      '--suites-randoop', '5'
+    ]
+    volumes:
+      - .:/opt/src
+```
+
+
+
+### Binary expressions with arithmethic operators
+
+[``lexp + rexp``](relations/lexp-plus-rexp/) 
+[``lexp - rexp``](relations/lexp-minus-rexp/) 
+[``lexp * rexp``](relations/lexp-times-rexp/) 
+[``lexp / rexp``](relations/lexp-div-rexp/) 
+[``lexp % rexp``](relations/lexp-mod-rexp/) 
+
+### Binary expressions with logical operators
+
+[``lexp && rexp``](relations/lexp-and-rexp/) 
+[``lexp || rexp``](relations/lexp-or-rexp/) 
+[``lexp ^ rexp``](relations/lexp-xor-rexp/) 
+
+### Binary expressions with relational operators
+
+[``lexp == rexp``](relations/lexp-equal-rexp/) 
+[``lexp != rexp``](relations/lexp-notequal-rexp/) 
+[``lexp > rexp``](relations/lexp-gt-rexp/) 
+[``lexp >= rexp``](relations/lexp-gte-rexp/) 
+[``lexp < rexp``](relations/lexp-lt-rexp/) 
+[``lexp <= rexp``](relations/lexp-lte-rexp/) 
+
+### Binary expressions with bitwise operators
+
+[``lexp & rexp``](relations/lexp-bit-and-rexp/) 
+[``lexp | rexp``](relations/lexp-bit-or-rexp/) 
+[``lexp ^ rexp``](relations/lexp-bit-xor-rexp/) 
+
+### Unary Expression
+
+[``exp``](relations/exp/) 
+[``+exp``](relations/plus-exp/) 
+[``-exp``](relations/minus-exp/) 
+[``++exp``](relations/preinc-exp/) 
+[``exp++``](relations/posinc-exp/) 
+[``--exp``](relations/predec-exp/) 
+[``exp--``](relations/posdec-exp/) 
+[``!exp``](relations/not-exp/) 
+[``~exp``](relations/bit-not-exp/) 
+
+### Arithmetic Compound Assigment
+
+[``lhs += rhs``](relations/plus-assigment/) 
+[``lhs -= rhs``](relations/minus-assigment/) 
+[``lhs *= rhs``](relations/times-assigment/) 
+[``lhs /= rhs``](relations/div-assigment/) 
+[``lhs %= rhs``](relations/mod-assigment/) 
+
+### Bit Shift Compound Assigment
+
+[``lhs <<= rhs``](relations/leftbit-assigment/) 
+[``lhs >>= rhs``](relations/rightbit-assigment/) 
+[``lhs >>>= rhs``](relations/rightunsignedbit-assigment/) 
+
+### Logical Compound Assigment
+
+[``lhs &= rhs``](relations/and-assigment/) 
+[``lhs |= rhs``](relations/or-assigment/) 
+[``lhs ^= rhs``](relations/xor-assigment/) 
+
+
+## Subjects
+
+| Project        | Version          | CLOC       |
+| :---           |             ---: |       ---: |
+| joda-time      |           2.10.1 |     28,790 |
+| commons-math   |            3.6.1 |    100,364 |
+| commons-lang   |              3.6 |     27,267 |
+| h2             |          1.4.199 |    134,234 |
+| javassist      |             3.20 |     35,249 |
+
+
+## RQ 1: _How many mutants are likely-subsumed?_
+
+1) Download the source-code of subjects analyzed.
+2) Add the *docker-compose.yml* file to the project root, use the config.json files corresponding to each subject.
+3) Run docker-composer with the command ``docker-compose up``
+
+
+*docker-compose.yml*
+```yml
+version: '3'
+services:
+  hunor:
+    image: hunor:0.9.8
+    working_dir: /opt/src
+    command: [
+      'hunor-eval',
+      '-j', '/usr/local/openjdk-8',
+      '-m', '/usr/share/maven',
+      '-c', 'config.json',
+      '--coverage-threshold', '0',
+      '--mutation-tool', 'mujava',
+      '--mutants', 'mutants',
+      '--disable-minimal-testsuite',
+      '--enable-new-mutations'
+    ]
+    volumes:
+      - .:/opt/src
+```
+
+**joda-time (2.10.1)**
+
+```sh
+git clone https://github.com/JodaOrg/joda-time -b v2.10.1
+```
+
+*config.json*
+```json
+{
+    "project": "joda-time",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main", "java"]
+}
+```
+
+**commons-math (3.6.1)**
+
+```sh
+git clone https://github.com/apache/commons-math -b 3.6.1-release
+```
+
+*config.json*
+```json
+{
+    "project": "commons-math",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main", "java"]
+}
+
+```
+
+**commons-lang (3.6)**
+
+```sh
+git clone https://github.com/apache/commons-lang -b LANG_3_6
+```
+
+*config.json*
+```json
+{
+    "project": "commons-lang",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main", "java"]
+}
+```
+**h2 (1.4.199)**
+```sh
+git clone https://github.com/h2database/h2database -b 1.4.199
+```
+
+*config.json*
+```json
+{
+    "project": "h2",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main"]
+}
+```
+
+**javassist (3.20)**
+
+```sh
+git clone https://github.com/jboss-javassist/javassist -b 3.20
+```
+
+*config.json*
+```json
+{
+    "project": "javassist",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main"]
+}
+```
+
+
+[Reduction and Effectiviness.csv](https://raw.githubusercontent.com/mutation-subsumption/subsumption-relations/master/Reduction%20and%20Effectiveness.csv)
+
+
+
+
+# Evaluation 02 - Evaluating the *i-rules*
+
+
+
+The docker-compose file shown below runs Hunor with the necessary parameters to generate the DMSG that represents the dynamic subsuming relationship on all project targets.
+ 
+With Docker and Docker Compose installed on your machine, follow these steps:
+
+1) Create or use an existing maven project.
+2) Add the *docker-compose.yml* file to the project root, along with the [*config.json*](https://raw.githubusercontent.com/mutation-subsumption/subsumption-relations/master/config-discover.json) configuration file.
+3) Run docker-composer with the command:
+
+*docker-compose.yml*
+```yml
+version: '3'
+services:
+  hunor:
+    image: mutationsubsumption/hunor:0.9.8
+    working_dir: /opt/src
+    command: [
+      'hunor-pgen',
+      '-j', '/usr/local/openjdk-8',
+      '-m', '/usr/share/maven',
+      '-c', 'config.json',
+      '--coverage-threshold', '0',
+      '--mutation-tool', 'mujava',
+      '--mutants', 'mutants',
+      '--disable-minimal-testsuite',
+      '--enable-new-mutations',
+      '--suites-evosuite', '5',
+      '--suites-randoop', '5'
+    ]
+    volumes:
+      - .:/opt/src
+```
+
+
+
+### Binary expressions with arithmethic operators
+
+[``lexp + rexp``](relations/lexp-plus-rexp/) 
+[``lexp - rexp``](relations/lexp-minus-rexp/) 
+[``lexp * rexp``](relations/lexp-times-rexp/) 
+[``lexp / rexp``](relations/lexp-div-rexp/) 
+[``lexp % rexp``](relations/lexp-mod-rexp/) 
+
+### Binary expressions with logical operators
+
+[``lexp && rexp``](relations/lexp-and-rexp/) 
+[``lexp || rexp``](relations/lexp-or-rexp/) 
+[``lexp ^ rexp``](relations/lexp-xor-rexp/) 
+
+### Binary expressions with relational operators
+
+[``lexp == rexp``](relations/lexp-equal-rexp/) 
+[``lexp != rexp``](relations/lexp-notequal-rexp/) 
+[``lexp > rexp``](relations/lexp-gt-rexp/) 
+[``lexp >= rexp``](relations/lexp-gte-rexp/) 
+[``lexp < rexp``](relations/lexp-lt-rexp/) 
+[``lexp <= rexp``](relations/lexp-lte-rexp/) 
+
+### Binary expressions with bitwise operators
+
+[``lexp & rexp``](relations/lexp-bit-and-rexp/) 
+[``lexp | rexp``](relations/lexp-bit-or-rexp/) 
+[``lexp ^ rexp``](relations/lexp-bit-xor-rexp/) 
+
+### Unary Expression
+
+[``exp``](relations/exp/) 
+[``+exp``](relations/plus-exp/) 
+[``-exp``](relations/minus-exp/) 
+[``++exp``](relations/preinc-exp/) 
+[``exp++``](relations/posinc-exp/) 
+[``--exp``](relations/predec-exp/) 
+[``exp--``](relations/posdec-exp/) 
+[``!exp``](relations/not-exp/) 
+[``~exp``](relations/bit-not-exp/) 
+
+### Arithmetic Compound Assigment
+
+[``lhs += rhs``](relations/plus-assigment/) 
+[``lhs -= rhs``](relations/minus-assigment/) 
+[``lhs *= rhs``](relations/times-assigment/) 
+[``lhs /= rhs``](relations/div-assigment/) 
+[``lhs %= rhs``](relations/mod-assigment/) 
+
+### Bit Shift Compound Assigment
+
+[``lhs <<= rhs``](relations/leftbit-assigment/) 
+[``lhs >>= rhs``](relations/rightbit-assigment/) 
+[``lhs >>>= rhs``](relations/rightunsignedbit-assigment/) 
+
+### Logical Compound Assigment
+
+[``lhs &= rhs``](relations/and-assigment/) 
+[``lhs |= rhs``](relations/or-assigment/) 
+[``lhs ^= rhs``](relations/xor-assigment/) 
+
+
+## Subjects
+
+| Project        | Version          | CLOC       |
+| :---           |             ---: |       ---: |
+| joda-time      |           2.10.1 |     28,790 |
+| commons-math   |            3.6.1 |    100,364 |
+| commons-lang   |              3.6 |     27,267 |
+| h2             |          1.4.199 |    134,234 |
+| javassist      |             3.20 |     35,249 |
+
+
+## RQ 1: _How many mutants are likely-subsumed?_
+
+1) Download the source-code of subjects analyzed.
+2) Add the *docker-compose.yml* file to the project root, use the config.json files corresponding to each subject.
+3) Run docker-composer with the command ``docker-compose up``
+
+
+*docker-compose.yml*
+```yml
+version: '3'
+services:
+  hunor:
+    image: hunor:0.9.8
+    working_dir: /opt/src
+    command: [
+      'hunor-eval',
+      '-j', '/usr/local/openjdk-8',
+      '-m', '/usr/share/maven',
+      '-c', 'config.json',
+      '--coverage-threshold', '0',
+      '--mutation-tool', 'mujava',
+      '--mutants', 'mutants',
+      '--disable-minimal-testsuite',
+      '--enable-new-mutations'
+    ]
+    volumes:
+      - .:/opt/src
+```
+
+**joda-time (2.10.1)**
+
+```sh
+git clone https://github.com/JodaOrg/joda-time -b v2.10.1
+```
+
+*config.json*
+```json
+{
+    "project": "joda-time",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main", "java"]
+}
+```
+
+**commons-math (3.6.1)**
+
+```sh
+git clone https://github.com/apache/commons-math -b 3.6.1-release
+```
+
+*config.json*
+```json
+{
+    "project": "commons-math",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main", "java"]
+}
+
+```
+
+**commons-lang (3.6)**
+
+```sh
+git clone https://github.com/apache/commons-lang -b LANG_3_6
+```
+
+*config.json*
+```json
+{
+    "project": "commons-lang",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main", "java"]
+}
+```
+**h2 (1.4.199)**
+```sh
+git clone https://github.com/h2database/h2database -b 1.4.199
+```
+
+*config.json*
+```json
+{
+    "project": "h2",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main"]
+}
+```
+
+**javassist (3.20)**
+
+```sh
+git clone https://github.com/jboss-javassist/javassist -b 3.20
+```
+
+*config.json*
+```json
+{
+    "project": "javassist",
+    "source": [
+        "."
+    ],
+    "java_src": ["src", "main"]
+}
+```
+
+
+[Reduction and Effectiviness.csv](https://raw.githubusercontent.com/mutation-subsumption/subsumption-relations/master/Reduction%20and%20Effectiveness.csv)
 
 
 
