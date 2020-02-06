@@ -56,7 +56,7 @@ Figure above summarizes the strategy process.
 ### Round 1
 
 JDolly programs 
-![Download](http://)
+![Download](https://github.com/easy-software-ufal/i-rules/raw/master/data/round01.zip)
 
 ### Round 2
 
@@ -75,7 +75,7 @@ JDolly programs
 
 
 Developer-writen programs: 
-![Download](http://)
+![Download][(https://github.com/easy-software-ufal/i-rules/raw/master/data/round02.zip)
 
 
 
